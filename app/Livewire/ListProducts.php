@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use Livewire\Component;
 
+
+use App\Filament\Pages\PermintaanDetails;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use Filament\Actions\Action;
@@ -14,6 +16,9 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 
@@ -25,25 +30,37 @@ class ListProducts extends Component  implements HasActions, HasSchemas, HasTabl
     use InteractsWithSchemas;
     use InteractsWithTable;
     
+    public $pembelian;
+
+    public function mount($pembelian)
+    {
+        $this->pembelian = $pembelian;
+    }
+
+
     public function table(Table $table): Table
     {
         return $table
-            ->query(PembelianDetail::query())
+            ->headerActions([
+                Action::make('input Harga')
+                ->url(config('filament.path') . "/admin/pembelians/{$this->pembelian->id}/input_harga"),
+            ])
+            ->query(
+                PembelianDetail::query()
+                    ->where('pembelian_id', $this->pembelian->id)
+            )
             ->columns([
                 TextColumn::make('nama_barang')->label('Nama Barang'),
                 TextColumn::make('jumlah')->label('Jumlah'),
                 TextColumn::make('satuan')->label('Satuan'),
                 TextColumn::make('harga_satuan')->label('Harga Satuan')->money('idr', true),
-                TextColumn::make('total_harga')->label('Total Harga')->money('idr', true),
+                TextColumn::make('total')->label('Total Harga')->money('idr', true),
             ])
-            ->filters([
-                // ...
+             ->bulkActions([
+                DeleteBulkAction::make(),
             ])
             ->recordActions([
-                // ...
-            ])
-            ->toolbarActions([
-                // ...
+                DeleteAction::make(),
             ]);
     }
     

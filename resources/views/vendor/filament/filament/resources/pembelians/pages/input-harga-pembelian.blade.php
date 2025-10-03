@@ -1,7 +1,8 @@
+<x-filament-panels::page>
+    {{-- Page content --}}
 
-    <x-filament-panels::page>
 
-            
+  
         @push('styles')
             <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
         @endpush
@@ -31,10 +32,7 @@
                                     <span class="w-40 font-semibold">ID Ekat</span> : 
                                     <span>{{ $record->id_ekatalog }}</span>
                                 </div>
-                                 <div class="flex gap-2">
-                                    <span class="w-40 font-semibold">ID Permintaan</span> : 
-                                    <span>{{ $record->permintaan_id }}</span>
-                                </div>
+                              
 
                         </div>
                         <div class="col-md-6">
@@ -65,12 +63,4 @@
             </x-filament::card>
 
             
-          
-
-
-          @livewire('list-products', ['pembelian' => $record])
-   
-    
 </x-filament-panels::page>
-
-

@@ -17,6 +17,7 @@ use Filament\Tables\Table;
 
 
 
+
 class PembelianResource extends Resource
 {
     protected static ?string $model = Pembelian::class;
@@ -50,6 +51,8 @@ class PembelianResource extends Resource
             'details' => Pages\PembelianDetails::route('/{record}/details'),
             'edit' => EditPembelian::route('/{record}/edit'),
             'list' => Pages\PembelianList::route('/{record}/list'),
+            'input_barang' => Pages\InputBarangPembelian::route('/{record}/input_barang'),
+            'input_harga' => Pages\InputhargaPembelian::route('/{record}/input_harga'),
           
         ];
     }

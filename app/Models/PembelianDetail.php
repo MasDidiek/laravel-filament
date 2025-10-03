@@ -17,6 +17,7 @@ class PembelianDetail extends Model
         'harga_satuan',
         'total',
         'keterangan',
+        'user_id'
     ];
 
    public function pembelian()
@@ -27,6 +28,20 @@ class PembelianDetail extends Model
     public function permintaanDetail()
     {
         return $this->belongsTo(PermintaanDetail::class, 'permintaan_detail_id');
+    }
+
+
+     protected static function boot()
+    {
+        parent::boot();
+
+        // Saat pembelian_detail dihapus
+        static::deleting(function ($detail) {
+            if ($detail->permintaan_detail_id) {
+                \App\Models\PermintaanDetail::where('id', $detail->permintaan_detail_id)
+                    ->update(['pembelian_id' => 0]);
+            }
+        });
     }
 
 }

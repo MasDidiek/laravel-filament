@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Pembelian;
+use App\Models\PembelianDetail;
+use App\Models\PermintaanDetail;
 
 class PembelianController extends Controller
 {
@@ -15,14 +18,31 @@ class PembelianController extends Controller
     }
 
 
-    public function detail($record)
+ 
+     public function tambahBarang(Pembelian $pembelian)
     {
-        // Logika untuk menampilkan detail pembelian berdasarkan $record (ID pembelian)
-        // Misalnya, Anda bisa mengambil data pembelian dari database dan mengirimkannya ke view
-        $pembelian = \App\Models\Pembelian::with('details')->findOrFail($record);
-        $permintaanDetails = $pembelian->permintaan->details; // Asumsikan ada relasi ke permintaan
-        return view('filament.resources.pembelians.pages.pembelians-details', compact('permintaanDetails', 'pembelian'));
+        $barangPermintaan = $pembelian->permintaan->details; // relasi Permintaan -> PermintaanDetail
+        return view('pembelian.input_barang_pembelian', compact('pembelian', 'barangPermintaan'));
     }
+
+    public function simpanBarang(Request $request, Pembelian $pembelian)
+    {
+        foreach ($request->barang_ids as $barangId) {
+            $permintaanDetail = PermintaanDetail::find($barangId);
+            PembelianDetail::create([
+                'pembelian_id' => $pembelian->id,
+                'nama_barang' => $permintaanDetail->nama_barang,
+                'jumlah' => $permintaanDetail->jumlah,
+                'satuan' => $permintaanDetail->satuan,
+                'harga_satuan' => 0,
+                'total_harga' => 0,
+            ]);
+        }
+
+        return redirect()->route('pembelian.show', $pembelian->id)
+            ->with('success', 'Barang berhasil ditambahkan.');
+    }
+
 
     /**
      * Show the form for creating a new resource.

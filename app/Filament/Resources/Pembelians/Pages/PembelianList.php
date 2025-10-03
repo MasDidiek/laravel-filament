@@ -32,7 +32,7 @@ class PembelianList extends Page
 
     public function getTitle(): string
     {
-        return "Detail  Pembelian";
+        return "Detail  Pembelian Barang";
     }
 
     
@@ -40,10 +40,15 @@ class PembelianList extends Page
     {
         return [
             Action::make('edit')
+                ->color('success')
                 ->url(fn () => $this->getResource()::getUrl('edit', ['record' => $this->record])),
             Action::make('delete')
+                ->color('danger')
                 ->requiresConfirmation()
                 ->action(fn () => $this->post->delete()),
+           Action::make('input barang')
+                ->url(fn () => $this->getResource()::getUrl('input_barang', ['record' => $this->record])),
+ 
         ];
     }
 
