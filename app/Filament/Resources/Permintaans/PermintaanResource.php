@@ -2,22 +2,23 @@
 
 namespace App\Filament\Resources\Permintaans;
 
-use App\Filament\Resources\Permintaans\Pages\CreatePermintaan;
+use BackedEnum;
+use App\Models\Permintaan;
+use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\Permintaans\Pages\EditPermintaan;
 use App\Filament\Resources\Permintaans\Pages\ListPermintaans;
+use App\Filament\Resources\Permintaans\Pages\CreatePermintaan;
 use App\Filament\Resources\Permintaans\Schemas\PermintaanForm;
 use App\Filament\Resources\Permintaans\Tables\PermintaansTable;
-use App\Models\Permintaan;
-use BackedEnum;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Columns\BadgeColumn;
 
 
 
@@ -47,7 +48,7 @@ class PermintaanResource extends Resource
                TextColumn::make('no_surat')
                 ->label('No Surat')
                 ->searchable()
-                ->url(fn ($record) => url(config('filament.path') . "/admin/permintaans/{$record->getKey()}/details"))
+                ->url(fn ($record) => url(config('filament.path') . "/admin/permintaans/{$record->getKey()}/view"))
                 ->openUrlInNewTab(false)
                 ->color('primary'),
                 TextColumn::make('puskesmas')->label('Puskesmas')->sortable(),
@@ -60,6 +61,7 @@ class PermintaanResource extends Resource
                     'info' => 'Diproses',
                     'success' => 'Selesai',
                 ]),
+               
                 
                 
             ]) 
@@ -93,12 +95,37 @@ class PermintaanResource extends Resource
         ];
     }
 
+    public static function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['details'] = collect($data['details'] ?? [])
+            ->map(function ($detail) {
+                $detail['user_id'] = Auth::id(); // isi user_id dengan user yang sedang login
+                return $detail;
+            })
+            ->toArray();
+
+        return $data;
+    }
+
+    public static function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['details'] = collect($data['details'] ?? [])
+            ->map(function ($detail) {
+                $detail['user_id'] = Auth::id();
+                return $detail;
+            })
+            ->toArray();
+
+        return $data;
+    }
+
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListPermintaans::route('/'),
             'create' => Pages\CreatePermintaan::route('/create'),
-             'details' => Pages\PermintaanDetails::route('/{record}/details'),
+             'details' => Pages\ViewPermintaan::route('/{record}/view'),
             'edit' => Pages\EditPermintaan::route('/{record}/edit'),
            
         ];
